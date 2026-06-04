@@ -1,0 +1,10 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <rect width="512" height="512" rx="100" fill="#1A1A1A"/>
+  <path d="M120 150 H280 L120 360 H280" stroke="#FBB03B" stroke-width="60" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M300 150 C380 150 400 200 400 240 C400 280 370 300 340 300 C390 300 420 340 420 390 C420 450 380 480 300 480" stroke="#006837" stroke-width="60" fill="none" stroke-linecap="round" stroke-linejoin="round" visibility="hidden"/>
+  <!-- Simplified ZB mark -->
+  <g transform="translate(40, 20)">
+     <path d="M80 130 H260 L100 380 H280" stroke="#FBB03B" stroke-width="70" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+     <path d="M260 130 C360 130 380 200 300 250 C380 300 360 380 260 380" stroke="#006837" stroke-width="70" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

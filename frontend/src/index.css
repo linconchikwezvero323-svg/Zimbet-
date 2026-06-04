@@ -1,0 +1,47 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-green: #006837;
+  --color-brand-gold: #FBB03B;
+  --color-brand-black: #1A1A1A;
+  --color-success: #28A745;
+  --color-danger: #DC3545;
+}
+
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light;
+  color: #1A1A1A;
+  background-color: #f3f4f6;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: #f3f4f6;
+}
+
+#root {
+  width: 100%;
+}
+
+.zimbet-gradient {
+  background: linear-gradient(135deg, #006837 0%, #1A1A1A 100%);
+}
+
+.btn-primary {
+  @apply bg-brand-green text-white font-bold py-2 px-4 rounded hover:bg-brand-green/90 transition-all;
+}
+
+.btn-secondary {
+  @apply bg-brand-gold text-brand-black font-bold py-2 px-4 rounded hover:bg-brand-gold/90 transition-all;
+}
