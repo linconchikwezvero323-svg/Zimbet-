@@ -2,7 +2,7 @@ module.exports = {
   development: {
     client: 'sqlite3',
     connection: {
-      filename: './src/db/zimbet.sqlite3'
+      filename: process.env.DATABASE_PATH || './src/db/zimbet.sqlite3'
     },
     useNullAsDefault: true,
     migrations: {
@@ -15,7 +15,7 @@ module.exports = {
   production: {
     client: 'sqlite3',
     connection: {
-      filename: './src/db/zimbet.sqlite3'
+      filename: process.env.DATABASE_PATH || './src/db/zimbet.sqlite3'
     },
     useNullAsDefault: true,
     migrations: {
