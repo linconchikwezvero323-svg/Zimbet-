@@ -6,10 +6,11 @@ const { authenticate, authorizeAdmin } = require('../middleware/auth');
 router.use(authenticate, authorizeAdmin);
 
 // Update odds
-router.post('/outcomes/:id/odds', async (req, res) => {
-  const { odds } = req.body;
+// Requirement: PUT /api/v1/admin/events/:id/odds - update odds (body: { outcomeId, odds })
+router.put('/events/:id/odds', async (req, res) => {
+  const { outcomeId, odds } = req.body;
   try {
-    await db('outcomes').where({ id: req.params.id }).update({ odds });
+    await db('outcomes').where({ id: outcomeId }).update({ odds });
     res.json({ message: 'Odds updated' });
   } catch (error) {
     res.status(500).json({ message: 'Error updating odds' });
@@ -17,8 +18,9 @@ router.post('/outcomes/:id/odds', async (req, res) => {
 });
 
 // Resolve event
-router.post('/events/:id/resolve', async (req, res) => {
-  const { result_home, result_away } = req.body;
+// Requirement: PUT /api/v1/admin/events/:id/resolve - resolve match (body: { homeScore, awayScore })
+router.put('/events/:id/resolve', async (req, res) => {
+  const { homeScore, awayScore } = req.body;
 
   const trx = await db.transaction();
   try {
@@ -28,8 +30,8 @@ router.post('/events/:id/resolve', async (req, res) => {
     // 1. Update event status and results
     await trx('events').where({ id: req.params.id }).update({
       status: 'finished',
-      result_home,
-      result_away
+      result_home: homeScore,
+      result_away: awayScore
     });
 
     // 2. Determine winning outcomes for 1X2 market (example)
@@ -40,9 +42,9 @@ router.post('/events/:id/resolve', async (req, res) => {
       for (const outcome of outcomes) {
         let isWinner = false;
         if (market.name === '1X2') {
-          if (outcome.name === event.home_team && result_home > result_away) isWinner = true;
-          else if (outcome.name === event.away_team && result_away > result_home) isWinner = true;
-          else if (outcome.name === 'Draw' && result_home === result_away) isWinner = true;
+          if (outcome.name === event.home_team && homeScore > awayScore) isWinner = true;
+          else if (outcome.name === event.away_team && awayScore > homeScore) isWinner = true;
+          else if (outcome.name === 'Draw' && homeScore === awayScore) isWinner = true;
         }
 
         await trx('outcomes').where({ id: outcome.id }).update({
@@ -162,6 +164,24 @@ router.get('/bets', async (req, res) => {
     res.json(betsWithLegs);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching all bets', error: error.message });
+  }
+});
+
+// Get admin stats
+// Requirement: GET /api/v1/admin/stats — { totalUsers, activeEvents, totalBets }
+router.get('/stats', async (req, res) => {
+  try {
+    const userCount = await db('users').count('id as count').first();
+    const eventCount = await db('events').where({ status: 'upcoming' }).count('id as count').first();
+    const betCount = await db('bets').count('id as count').first();
+
+    res.json({
+      totalUsers: userCount.count,
+      activeEvents: eventCount.count,
+      totalBets: betCount.count
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching stats', error: error.message });
   }
 });
 
