@@ -57,10 +57,6 @@ router.post('/events/:id/resolve', async (req, res) => {
     }
 
     // 4. Settle bets
-    // A bet is won if ALL its legs are 'won'.
-    // A bet is lost if ANY of its legs are 'lost'.
-    // We only process 'pending' bets.
-    
     const pendingBets = await trx('bets').where({ status: 'pending' });
     
     for (const bet of pendingBets) {
@@ -106,6 +102,66 @@ router.get('/users', async (req, res) => {
     res.json(users);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching users' });
+  }
+});
+
+// Get all events with markets and outcomes (admin)
+router.get('/events', async (req, res) => {
+  try {
+    const events = await db('events')
+      .join('leagues', 'events.league_id', 'leagues.id')
+      .join('sports', 'leagues.sport_id', 'sports.id')
+      .select(
+        'events.*',
+        'leagues.name as league_name',
+        'sports.name as sport_name'
+      )
+      .orderBy('events.start_time', 'desc');
+
+    const eventsWithOdds = await Promise.all(events.map(async (event) => {
+      const markets = await db('markets').where({ event_id: event.id });
+      
+      const marketsWithOutcomes = await Promise.all(markets.map(async (market) => {
+        const outcomes = await db('outcomes').where({ market_id: market.id });
+        return { ...market, outcomes };
+      }));
+
+      return { ...event, markets: marketsWithOutcomes };
+    }));
+
+    res.json(eventsWithOdds);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching admin events', error: error.message });
+  }
+});
+
+// View all bets (admin)
+router.get('/bets', async (req, res) => {
+  try {
+    const bets = await db('bets')
+      .join('users', 'bets.user_id', 'users.id')
+      .select('bets.*', 'users.username', 'users.phone_number')
+      .orderBy('bets.created_at', 'desc');
+
+    const betsWithLegs = await Promise.all(bets.map(async (bet) => {
+      const legs = await db('bet_legs')
+        .join('outcomes', 'bet_legs.outcome_id', 'outcomes.id')
+        .join('markets', 'outcomes.market_id', 'markets.id')
+        .join('events', 'markets.event_id', 'events.id')
+        .select(
+          'bet_legs.*',
+          'outcomes.name as selection',
+          'markets.name as market_name',
+          'events.home_team',
+          'events.away_team'
+        )
+        .where({ bet_id: bet.id });
+      return { ...bet, legs };
+    }));
+
+    res.json(betsWithLegs);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching all bets', error: error.message });
   }
 });
 
