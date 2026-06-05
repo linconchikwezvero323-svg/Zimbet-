@@ -1,7 +1,6 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const knex = require('knex')(require('./knexfile').development);
 
 const authRoutes = require('./src/routes/auth');
 const sportsRoutes = require('./src/routes/sports');
