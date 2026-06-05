@@ -1,6 +1,6 @@
 import { User, Sport, Event, Bet, Transaction } from '../types';
 
-const BASE_URL = 'http://localhost:3001/api/v1';
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api/v1';
 
 const getHeaders = () => {
   const token = localStorage.getItem('zimbet_token');
