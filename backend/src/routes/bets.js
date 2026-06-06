@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { v4: uuidv4 } = require('uuid');
+const { randomUUID } = require('crypto');
 const db = require('../config/db');
 const { authenticate } = require('../middleware/auth');
 
@@ -40,14 +40,14 @@ router.post('/', authenticate, async (req, res) => {
 
       totalOdds *= outcome.odds;
       legData.push({
-        id: uuidv4(),
+        id: randomUUID(),
         outcome_id: outcome.id,
         odds_at_placement: outcome.odds
       });
     }
 
     const potential_payout = stake * totalOdds;
-    const betId = uuidv4();
+    const betId = randomUUID();
 
     // Deduct balance
     await trx('users').where({ id: req.user.id }).update({
@@ -68,7 +68,7 @@ router.post('/', authenticate, async (req, res) => {
 
     // Create transaction record
     await trx('transactions').insert({
-      id: uuidv4(),
+      id: randomUUID(),
       user_id: req.user.id,
       amount: -stake,
       type: 'bet_placed',
