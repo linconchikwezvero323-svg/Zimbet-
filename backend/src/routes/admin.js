@@ -77,7 +77,7 @@ router.put('/events/:id/resolve', async (req, res) => {
         await trx('bets').where({ id: bet.id }).update({ status: 'won' });
 
         await trx('transactions').insert({
-          id: require('uuid').v4(),
+          id: require('crypto').randomUUID(),
           user_id: bet.user_id,
           amount: bet.potential_payout,
           type: 'bet_payout',

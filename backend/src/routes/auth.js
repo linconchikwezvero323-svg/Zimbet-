@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { v4: uuidv4 } = require('uuid');
+const { randomUUID } = require('crypto');
 const db = require('../config/db');
 const { authenticate } = require('../middleware/auth');
 
@@ -16,7 +16,7 @@ router.post('/register', async (req, res) => {
 
   try {
     const password_hash = await bcrypt.hash(password, 10);
-    const id = uuidv4();
+    const id = randomUUID();
 
     await db('users').insert({
       id,

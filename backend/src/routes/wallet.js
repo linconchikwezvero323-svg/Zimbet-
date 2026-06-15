@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { v4: uuidv4 } = require('uuid');
+const { randomUUID } = require('crypto');
 const db = require('../config/db');
 const { authenticate } = require('../middleware/auth');
 
@@ -12,7 +12,7 @@ router.post('/deposit', authenticate, async (req, res) => {
     return res.status(400).json({ message: 'Invalid amount' });
   }
 
-  const transactionId = uuidv4();
+  const transactionId = randomUUID();
   
   try {
     // In a real app, we'd call EcoCash/InnBucks API here.
@@ -76,7 +76,7 @@ router.post('/withdraw', authenticate, async (req, res) => {
       return res.status(400).json({ message: 'Insufficient balance' });
     }
 
-    const transactionId = uuidv4();
+    const transactionId = randomUUID();
 
     // Deduct balance immediately for withdrawal
     await trx('users').where({ id: req.user.id }).update({
